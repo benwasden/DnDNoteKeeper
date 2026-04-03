@@ -1,10 +1,21 @@
 using DnDNoteKeeper.Components;
+using DnDNoteKeeper.Data;
+using Microsoft.EntityFrameworkCore;
+using DnDNoteKeeper.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+// Fetch the Connection String
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+// Add the DbContext to the container
+builder.Services.AddDbContext<DnDDbContext>(options =>
+    options.UseSqlServer(connectionString));
 
 var app = builder.Build();
 
