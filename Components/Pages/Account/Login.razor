@@ -10,28 +10,30 @@
 
 <div class="row">
     <div>
-        <EditForm Model="@Model" OnValidSubmit="Authenticate" FormName="LoginForm">
-            <DataAnnotationsValidator />
-            <div>
-                <h3>Login</h3>
-            </div>
-            <div>
-                <label>Username</label>
-                <InputText @bind-Value="Model.UserName" class="form-control" placeholder="Username" />
-                <ValidationMessage For="() => Model.UserName" />
-            </div>
-            <div>
-                <label>Password</label>
-                <InputText @bind-Value="Model.Password" placeholder="Password" type="password" class="form-control" />
-                <ValidationMessage For="() => Model.Password" />
-            </div>
-            <div>
-                <span class="text-danger">@errorMessage</span>
-            </div>
-            <div>
-                <button type="submit">Login</button>
-            </div>
-        </EditForm>
+        @if (Model != null) {
+            <EditForm Model="@Model" OnValidSubmit="Authenticate" FormName="LoginForm">
+                <DataAnnotationsValidator />
+                <div>
+                    <h3>Login</h3>
+                </div>
+                <div>
+                    <label>Username</label>
+                    <InputText @bind-Value="Model.UserName" class="form-control" placeholder="Username" />
+                    <ValidationMessage For="() => Model.UserName" />
+                </div>
+                <div>
+                    <label>Password</label>
+                    <InputText @bind-Value="Model.Password" placeholder="Password" type="password" class="form-control" />
+                    <ValidationMessage For="() => Model.Password" />
+                </div>
+                <div>
+                    <span class="text-danger">@errorMessage</span>
+                </div>
+                <div>
+                    <button type="submit">Login</button>
+                </div>
+            </EditForm>
+        }
     </div>
 </div>
 
@@ -40,11 +42,14 @@
     public HttpContext? HttpContext{ get; set; }
 
     [SupplyParameterFromForm]
-    public LoginViewModel Model{ get; set; } = new();
+    public LoginViewModel? Model{ get; set; }
 
     private string? errorMessage;
 
+    protected override void OnInitialized() => Model ??= new();
+
     private async Task Authenticate() {
+        if (Model is null) return;
         var userAccount = appDbContext.UserAccounts.Where(x => x.UserName == Model.UserName).FirstOrDefault();
         if (userAccount is null || userAccount.Password != Model.Password) {
             errorMessage = "Invalid username or password";
@@ -52,12 +57,17 @@
         }
 
         var claims = new List<Claim> {
-              new Claim(ClaimTypes.Name, Model.UserName)
+              new Claim(ClaimTypes.Name, Model.UserName ?? string.Empty)
         };
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
-        await HttpContext.SignInAsync(principal);
-        navigationManager.NavigateTo("/");
+        if (HttpContext != null) {
+            await HttpContext.SignInAsync(principal);
+            navigationManager.NavigateTo("/");
+        }
+        else {
+            errorMessage = "Authentication context not found";
+        }
     }
 }
