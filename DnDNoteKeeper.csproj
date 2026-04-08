@@ -19,4 +19,9 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Components/Pages/Account/" />
+    <Folder Include="Models/ViewModels/" />
+  </ItemGroup>
+
 </Project>

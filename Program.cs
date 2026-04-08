@@ -2,6 +2,7 @@ using DnDNoteKeeper.Components;
 using DnDNoteKeeper.Data;
 using Microsoft.EntityFrameworkCore;
 using DnDNoteKeeper.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,16 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 // Add the DbContext to the container
 builder.Services.AddDbContext<DnDDbContext>(options =>
     options.UseSqlServer(connectionString));
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.Name = "auth_token";
+        options.LoginPath = "/login";
+        options.Cookie.MaxAge = TimeSpan.FromMinutes(30);
+        options.AccessDeniedPath = "/access-denied";
+    });
+builder.Services.AddAuthorization();
+builder.Services.AddCascadingAuthenticationState();
 
 var app = builder.Build();
 
@@ -30,6 +41,8 @@ app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages:
 app.UseHttpsRedirection();
 
 app.UseAntiforgery();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()

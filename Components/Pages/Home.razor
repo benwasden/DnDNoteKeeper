@@ -4,4 +4,13 @@
 
 <h1>DnD Note Keeper</h1>
 
-Starting work!
+<div>
+    <AuthorizeView>
+        <NotAuthorized>
+            <span>You aren't logged in. Please <a href="/login">click here</a> to login.</span>
+        </NotAuthorized>
+        <Authorized>
+            <span>Logged in as <b>@context.User.Identity.Name</b>. <a href="/logout">Click here</a> to logout</span>
+        </Authorized>
+    </AuthorizeView>
+</div>
