@@ -1,16 +1,17 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+<PageTitle>DnD Note Keeper - Organize Your Adventures</PageTitle>
 
 <h1>DnD Note Keeper</h1>
 
 <div>
     <AuthorizeView>
         <NotAuthorized>
-            <span>You aren't logged in. Please <a href="/login">click here</a> to login.</span>
+            <UnAuthHome />
         </NotAuthorized>
         <Authorized>
             <span>Logged in as <b>@(context.User.Identity?.Name ?? "Unknown User")</b>. <a href="/logout">Click here</a> to logout</span>
+            @* <UserPage /> *@
         </Authorized>
     </AuthorizeView>
 </div>

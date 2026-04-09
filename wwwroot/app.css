@@ -50,6 +50,66 @@ h1:focus {
     border-color: #929292;
 }
 
+/* Mobile Navigation Enhancements */
+@media (max-width: 767.98px) {
+    body.nav-open {
+        overflow: hidden;
+    }
+}
+
+/* Mobile optimizations */
+@media (max-width: 575.98px) {
+    .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .card-body {
+        padding: 1rem !important;
+    }
+    
+    .btn-lg {
+        padding: 0.675rem 1.25rem;
+        font-size: 1rem;
+    }
+    
+    .display-4 {
+        font-size: 2rem !important;
+    }
+    
+    .lead {
+        font-size: 1rem !important;
+    }
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Focus styles for accessibility */
+.btn:focus,
+.nav-link:focus,
+a:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+/* Performance optimizations */
+.card,
+.nav-link {
+    will-change: transform;
+}
+
+/* Touch-friendly sizing */
+@media (max-width: 767.98px) {
+    .nav-link,
+    .mobile-nav-item,
+    .btn {
+        min-height: 44px;
+    }
+}
+
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
     color: var(--bs-secondary-color);
     text-align: end;

@@ -1,33 +1,96 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">DnDNoteKeeper</a>
+﻿<!-- Desktop Navigation -->
+<div class="desktop-nav">
+    <div class="nav-header">
+        <div class="d-flex align-items-center p-3">
+            <div class="nav-logo me-2">
+                <i class="bi bi-dice-6 text-white fs-3"></i>
+            </div>
+            <div>
+                <a class="navbar-brand text-white fw-bold text-decoration-none" href="">DnD Note Keeper</a>
+                <div class="nav-subtitle">Organize Your Adventures</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-scrollable">
+        <nav class="nav flex-column">
+            <!-- Main Navigation -->
+            <div class="nav-section-header">Main</div>
+            <div class="nav-item">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <i class="bi bi-house-door me-3"></i>
+                    <span>Home</span>
+                </NavLink>
+            </div>
+            <AuthorizeView>
+                <Authorized>
+                    <div class="nav-item">
+                        <NavLink class="nav-link" href="dashboard">
+                            <i class="bi bi-speedometer2 me-3"></i>
+                            <span>Dashboard</span>
+                        </NavLink>
+                    </div>
+                    
+                    <!-- DnD Features -->
+                    <div class="nav-section-header">Campaign Tools</div>
+                    <div class="nav-item">
+                        <NavLink class="nav-link" href="campaigns">
+                            <i class="bi bi-journal-bookmark me-3"></i>
+                            <span>Campaigns</span>
+                        </NavLink>
+                    </div>
+                    <div class="nav-item">
+                        <NavLink class="nav-link" href="characters">
+                            <i class="bi bi-people me-3"></i>
+                            <span>Characters</span>
+                        </NavLink>
+                    </div>
+                    <div class="nav-item">
+                        <NavLink class="nav-link" href="world-maps">
+                            <i class="bi bi-map me-3"></i>
+                            <span>World Maps</span>
+                        </NavLink>
+                    </div>
+                    <div class="nav-item">
+                        <NavLink class="nav-link" href="sessions">
+                            <i class="bi bi-calendar-event me-3"></i>
+                            <span>Sessions</span>
+                        </NavLink>
+                    </div>
+                    <div class="nav-item">
+                        <NavLink class="nav-link" href="notes">
+                            <i class="bi bi-file-text me-3"></i>
+                            <span>Notes</span>
+                        </NavLink>
+                    </div>
+
+                    <!-- Account -->
+                    <div class="nav-section-header">Account</div>
+                    <div class="nav-item">
+                        <NavLink class="nav-link" href="settings">
+                            <i class="bi bi-gear me-3"></i>
+                            <span>Settings</span>
+                        </NavLink>
+                    </div>
+
+                    <div class="nav-section-header">Account</div>
+                    <div class="nav-item">
+                        <NavLink class="nav-link" href="logout">
+                            <i class="bi bi-gear me-3"></i>
+                            <span>Logout</span>
+                        </NavLink>
+                    </div>
+                </Authorized>
+                <NotAuthorized>
+                    <div class="nav-section-header">Account</div>
+                    <div class="nav-item">
+                        <NavLink class="nav-link" href="login">
+                            <i class="bi bi-gear me-3"></i>
+                            <span>Login</span>
+                        </NavLink>
+                    </div>
+                </NotAuthorized>
+            </AuthorizeView>
+        </nav>
     </div>
 </div>
-
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-
-        <AuthorizeView>
-            <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="counter">
-                        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="weather">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-                    </NavLink>
-                </div>
-            </Authorized>
-        </AuthorizeView>
-    </nav>
-</div>
-
