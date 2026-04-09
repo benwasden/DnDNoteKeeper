@@ -86,17 +86,14 @@
     <main class="main-content">
         <!-- Desktop Top Bar -->
         <div class="top-row px-4 d-none d-md-flex">
-            <div class="ms-auto d-flex align-items-center">
-                <a href="#" class="top-nav-link me-4">
-                    <i class="bi bi-bookmark me-2"></i> Features
-                </a>
-                <a href="#" class="top-nav-link me-4">
-                    <i class="bi bi-chat-dots me-2"></i> Support
-                </a>
-                <a href="#" class="btn btn-primary btn-sm">
-                    <i class="bi bi-rocket-takeoff me-2"></i> Get Started
-                </a>
-            </div>
+            <AuthorizeView>
+                <NotAuthorized>
+                    <a href="/login">Login</a>
+                </NotAuthorized>
+                <Authorized>
+                    <a href="/logout">Logout</a>
+                </Authorized>
+            </AuthorizeView>
         </div>
 
         <article class="content">

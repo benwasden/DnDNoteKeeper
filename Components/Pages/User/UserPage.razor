@@ -1,13 +1,16 @@
-﻿@page "/dashboard"
-@page "/user"
+﻿@page "/user"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 
 <PageTitle>Dashboard - DnD Note Keeper</PageTitle>
 
 <!-- Welcome Header -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h1 class="h3 mb-1">Welcome back, Adventurer!</h1>
-        <p class="text-muted mb-0">Ready to continue your epic journey?</p>
+        <AuthorizeView>
+            <h1 class="h3 mb-1">Welcome back @(context.User.Identity?.Name ?? "Unknown User")!</h1>
+            <p class="text-muted mb-0">Ready to continue your epic journey?</p>
+        </AuthorizeView>
     </div>
     <div class="d-none d-md-block">
         <button class="btn btn-primary">

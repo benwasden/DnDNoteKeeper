@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using DnDNoteKeeper.Components.Pages.User
 
 <PageTitle>DnD Note Keeper - Organize Your Adventures</PageTitle>
 
@@ -8,8 +9,8 @@
             <UnAuthHome />
         </NotAuthorized>
         <Authorized>
-            <span>Logged in as <b>@(context.User.Identity?.Name ?? "Unknown User")</b>. <a href="/logout">Click here</a> to logout</span>
-            @* <UserPage /> *@
+            @* <span>Logged in as <b>@(context.User.Identity?.Name ?? "Unknown User")</b>. <a href="/logout">Click here</a> to logout</span> *@
+            <UserPage />
         </Authorized>
     </AuthorizeView>
 </div>
