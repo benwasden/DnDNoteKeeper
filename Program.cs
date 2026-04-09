@@ -1,4 +1,3 @@
-using DnDNoteKeeper.Components;
 using DnDNoteKeeper.Data;
 using Microsoft.EntityFrameworkCore;
 using DnDNoteKeeper.Models;
@@ -45,7 +44,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
-app.MapRazorComponents<App>()
+app.MapRazorComponents<global::DnDNoteKeeper.Components.App>()
     .AddInteractiveServerRenderMode();
 
 app.Run();
