@@ -9,16 +9,16 @@ public class UserAccount
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    [Column("id")]
+    [Column("user_id")]
     public int Id { get; set; }
 
-    [Column("user_name")]
+    [Column("username")]
     [MaxLength(100)]
 
     public string? UserName { get; set; }
 
     [Column("password")]
-    [MaxLength(255)]
+    [MaxLength(100)]
 
     public string? Password { get; set; }
 }

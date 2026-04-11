@@ -1,5 +1,67 @@
 ﻿@page "/register"
+@using DnDNoteKeeper.Data
+@using DnDNoteKeeper.Models
+@using DnDNoteKeeper.Models.ViewModels
+@using DnDNoteKeeper.Services
+@inject DnDDbContext appDbContext
+@inject NavigationManager navigationManager
+
+<div class="row">
+    <div>
+        <EditForm Model="@RegModel" OnValidSubmit="HandleRegistration" FormName="RegisterForm">
+            <DataAnnotationsValidator />
+            <h3>Create Account</h3>
+            
+            <div>
+                <label>Username</label>
+                <InputText @bind-Value="RegModel.UserName" class="form-control" />
+                <ValidationMessage For="() => RegModel.UserName" />
+            </div>
+            <div>
+                <label>Password</label>
+                <InputText @bind-Value="RegModel.Password" type="password" class="form-control" />
+                <ValidationMessage For="() => RegModel.Password" />
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Register</button>
+            <span class="text-danger">@errorMessage</span>
+        </EditForm>
+    </div>
+</div>
 
 @code {
+    [SupplyParameterFromForm]
+    public required LoginViewModel RegModel { get; set; }
 
+    protected override void OnInitialized()
+    {
+        RegModel ??= new();
+    }
+
+    private string? errorMessage;
+
+    private async Task HandleRegistration() {
+        try {
+            var existing = appDbContext.UserAccounts.Any(x => x.UserName == RegModel.UserName);
+
+            if (existing) {
+                errorMessage = "Username already taken.";
+                return;
+            }
+
+            var newUser = new UserAccount {
+                UserName = RegModel.UserName,
+
+                Password = PasswordHasher.HashPassword(RegModel.Password ?? string.Empty) 
+            };
+
+            appDbContext.UserAccounts.Add(newUser);
+            await appDbContext.SaveChangesAsync();
+            
+            navigationManager.NavigateTo("/");
+        } catch (Exception ex) {
+            Console.WriteLine(ex);
+            errorMessage = $"A database error occured. Please try again later.";
+        }
+    }
 }

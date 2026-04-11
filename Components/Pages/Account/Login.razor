@@ -5,6 +5,7 @@
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
+@using DnDNoteKeeper.Services
 @inject DnDDbContext appDbContext
 @inject NavigationManager navigationManager
 
@@ -30,9 +31,10 @@
                     <span class="text-danger">@errorMessage</span>
                 </div>
                 <div>
-                    <button type="submit">Login</button>
+                    <button type="submit" class="btn btn-primary">Login</button>
                 </div>
             </EditForm>
+            <span>Don't have an account? <a href="/register">Click here to register!</a></span>
         }
     </div>
 </div>
@@ -49,25 +51,33 @@
     protected override void OnInitialized() => Model ??= new();
 
     private async Task Authenticate() {
-        if (Model is null) return;
-        var userAccount = appDbContext.UserAccounts.Where(x => x.UserName == Model.UserName).FirstOrDefault();
-        if (userAccount is null || userAccount.Password != Model.Password) {
-            errorMessage = "Invalid username or password";
-            return;
-        }
+        try {
+            if (Model is null) return;
 
-        var claims = new List<Claim> {
-              new Claim(ClaimTypes.Name, Model.UserName ?? string.Empty)
-        };
+            var userAccount = appDbContext.UserAccounts
+                .FirstOrDefault(x => x.UserName == Model.UserName);
 
-        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        var principal = new ClaimsPrincipal(identity);
-        if (HttpContext != null) {
-            await HttpContext.SignInAsync(principal);
-            navigationManager.NavigateTo("/");
-        }
-        else {
-            errorMessage = "Authentication context not found";
+            if (userAccount is null || !PasswordHasher.VerifyPassword(Model.Password ?? string.Empty, userAccount.Password ?? string.Empty)) {
+                errorMessage = "Invalid username or password";
+                return;
+            }
+
+            var claims = new List<Claim> {
+                new Claim(ClaimTypes.Name, Model.UserName ?? string.Empty)
+            };
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+            if (HttpContext != null) {
+                await HttpContext.SignInAsync(principal);
+                navigationManager.NavigateTo("/");
+            }
+            else {
+                errorMessage = "Authentication context not found";
+            }
+        } catch (Exception ex) {
+            Console.WriteLine(ex);
+            errorMessage = $"A database error occured. Please try again later.";
         }
     }
 }
