@@ -18,7 +18,7 @@ public class UserAccount
     public string? UserName { get; set; }
 
     [Column("password")]
-    [MaxLength(100)]
+    [MaxLength(255)]
 
     public string? Password { get; set; }
 }
