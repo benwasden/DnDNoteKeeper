@@ -9,7 +9,6 @@
             <UnAuthHome />
         </NotAuthorized>
         <Authorized>
-            @* <span>Logged in as <b>@(context.User.Identity?.Name ?? "Unknown User")</b>. <a href="/logout">Click here</a> to logout</span> *@
             <UserPage />
         </Authorized>
     </AuthorizeView>
