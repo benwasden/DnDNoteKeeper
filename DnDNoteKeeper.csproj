@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <Folder Include="Components/Pages/Account/" />
+    <Folder Include="Components/Pages/Character/" />
     <Folder Include="Models/ViewModels/" />
   </ItemGroup>
 
