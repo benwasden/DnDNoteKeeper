@@ -10,7 +10,6 @@
 @inject DnDDbContext appDbContext
 @inject NavigationManager navigationManager
 @inject AuthenticationStateProvider AuthStateProvider
-
 @attribute [Authorize]
 
 
@@ -88,6 +87,7 @@
                                 <i class="bi bi-plus-circle me-2"></i>Create Campaign
                             </button>
                         </div>
+                        <span class="text-danger">@errorMessage</span>
                     </EditForm>
                 </div>
             </div>
@@ -106,14 +106,16 @@
     private IBrowserFile? selectedFile;
     private string? currentUserName;
     private int currentUserId;
+    private string? errorMessage;
 
-    protected override async Task OnInitializedAsync()
-    {
+    protected override async Task OnInitializedAsync() {
+        // Get user's ID and username to add to db
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
-        if (user.Identity?.IsAuthenticated == true)
-        {
+        // If user's authenticated...
+        if (user.Identity?.IsAuthenticated == true) {
+            // Username is equal to fetched username
             currentUserName = user.Identity.Name;
             var idClaim = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
             if (idClaim != null) currentUserId = int.Parse(idClaim.Value);
@@ -122,39 +124,42 @@
         }
     }
 
-    private async Task HandleSubmit()
-    {
+    // Uploads image to blob db, gets url of image, then assigns form data and image url before
+    // sending off to sql database
+    private async Task HandleSubmit() {
         string? imageUrl = null;
+        try {
+            // Photo upload to blob
+            if (selectedFile != null) {
+                var containerClient = BlobServiceClient.GetBlobContainerClient("campaign-images");
+                var blobName = $"{Guid.NewGuid()}{Path.GetExtension(selectedFile.Name)}";
+                var blobClient = containerClient.GetBlobClient(blobName);
 
-        // 1. Handle Azure Upload
-        if (selectedFile != null)
-        {
-            var containerClient = BlobServiceClient.GetBlobContainerClient("campaign-images");
-            var blobName = $"{Guid.NewGuid()}{Path.GetExtension(selectedFile.Name)}";
-            var blobClient = containerClient.GetBlobClient(blobName);
+                using var stream = selectedFile.OpenReadStream(maxAllowedSize: 1024 * 1024 * 5);
+                await blobClient.UploadAsync(stream, new BlobHttpHeaders { ContentType = selectedFile.ContentType });
+                imageUrl = blobClient.Uri.ToString();
+            }
 
-            using var stream = selectedFile.OpenReadStream(maxAllowedSize: 1024 * 1024 * 5);
-            await blobClient.UploadAsync(stream, new BlobHttpHeaders { ContentType = selectedFile.ContentType });
-            imageUrl = blobClient.Uri.ToString();
+            // User entity info
+            var dbCampaign = new CampaignDetails {
+                CampaignName = campaignModel.Name,
+                Description = campaignModel.Description,
+                Location = campaignModel.Location,
+                CampaignImage = imageUrl,
+                UserId = currentUserId,
+                UserName = currentUserName
+            };
+
+            // Save to sql db
+            appDbContext.Campaigns.Add(dbCampaign);
+            await appDbContext.SaveChangesAsync();
+
+            navigationManager.NavigateTo("/");  
+            
+        } catch (Exception ex) {
+            Console.WriteLine(ex);
+            errorMessage = "A database error occured. Please try again later.";
         }
-
-        // 2. Create the Entity with User Info
-        var dbCampaign = new CampaignDetails
-        {
-            CampaignName = campaignModel.Name,
-            Description = campaignModel.Description,
-            Location = campaignModel.Location,
-            CampaignImage = imageUrl,
-            UserId = currentUserId,
-            UserName = currentUserName
-        };
-
-        // 3. Save to SQL
-        appDbContext.Campaigns.Add(dbCampaign);
-        await appDbContext.SaveChangesAsync();
-
-        navigationManager.NavigateTo("/");
     }
-
-    private void HandleFileSelected(InputFileChangeEventArgs e) => selectedFile = e.File;
-}
+        private void HandleFileSelected(InputFileChangeEventArgs e) => selectedFile = e.File;
+} 
