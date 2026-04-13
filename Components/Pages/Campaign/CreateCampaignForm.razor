@@ -1,0 +1,160 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using DnDNoteKeeper.Data
+@using DnDNoteKeeper.Models
+@using DnDNoteKeeper.Models.ViewModels
+@using DnDNoteKeeper.Services
+@using Microsoft.AspNetCore.Authorization
+@using Azure.Storage.Blobs
+@using Azure.Storage.Blobs.Models
+@inject BlobServiceClient BlobServiceClient
+@inject DnDDbContext appDbContext
+@inject NavigationManager navigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+
+@attribute [Authorize]
+
+
+<div class="container-fluid px-4 py-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h2 class="h3 mb-1">Create New Campaign</h2>
+                    <p class="text-muted mb-0">Set up your campaign details and get started</p>
+                </div>
+                <a href="/campaigns" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Campaigns
+                </a>
+            </div>
+
+            <!-- Campaign Form -->
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <EditForm Model="@campaignModel" OnValidSubmit="@HandleSubmit" FormName="CreateCampaignForm">
+                        <AntiforgeryToken />
+                        <DataAnnotationsValidator />
+                        
+                        <!-- Campaign Name -->
+                        <div class="mb-3">
+                            <label for="campaignName" class="form-label fw-bold">Campaign Name *</label>
+                            <InputText @bind-Value="campaignModel.Name" 
+                                     class="form-control" 
+                                     id="campaignName"
+                                     placeholder="Enter campaign name..." />
+                            <ValidationMessage For="() => campaignModel.Name" class="text-danger" />
+                        </div>
+
+                        <!-- Campaign Description -->
+                        <div class="mb-3">
+                            <label for="campaignDescription" class="form-label fw-bold">Description</label>
+                            <InputTextArea @bind-Value="campaignModel.Description" 
+                                         class="form-control" 
+                                         id="campaignDescription"
+                                         rows="4"
+                                         placeholder="Describe your campaign..." />
+                            <ValidationMessage For="() => campaignModel.Description" class="text-danger" />
+                        </div>
+
+                        <!-- Time -->
+                        <div class="mb-3">
+                            <label for="campaignTime" class="form-label fw-bold">Time</label>
+                            <InputDate Type="InputDateType.DateTimeLocal" @bind-Value="campaignModel.Time" 
+                                      class="form-control" 
+                                      id="campaignTime" />
+                            <ValidationMessage For="() => campaignModel.Time" class="text-danger" />
+                        </div>
+
+                        <!-- Image -->
+                        <div class="mb-3">
+                            <label for="campaignImage" class="form-label fw-bold">Image</label>
+                            <InputFile OnChange="HandleFileSelected" accept=".jpg,.jpeg,.png" />
+                        </div>
+
+                        <!-- Location -->
+                        <div class="mb-3">
+                            <label for="campaignLocation" class="form-label fw-bold">Location</label>
+                            <InputText @bind-Value="campaignModel.Location" 
+                                      class="form-control" 
+                                      id="campaignLocation"
+                                      placeholder="Enter location..." />
+                            <ValidationMessage For="() => campaignModel.Location" class="text-danger" />
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-flex justify-content-end">
+                            <button type="button" class="btn btn-outline-secondary me-2">Cancel</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-plus-circle me-2"></i>Create Campaign
+                            </button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    public CampaignViewModel campaignModel { get; set; } = default!;
+
+    protected override void OnInitialized() {
+        campaignModel ??= new CampaignViewModel();
+    }
+
+    private IBrowserFile? selectedFile;
+    private string? currentUserName;
+    private int currentUserId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            currentUserName = user.Identity.Name;
+            var idClaim = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            if (idClaim != null) currentUserId = int.Parse(idClaim.Value);
+            
+            campaignModel.UserId = currentUserId;
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        string? imageUrl = null;
+
+        // 1. Handle Azure Upload
+        if (selectedFile != null)
+        {
+            var containerClient = BlobServiceClient.GetBlobContainerClient("campaign-images");
+            var blobName = $"{Guid.NewGuid()}{Path.GetExtension(selectedFile.Name)}";
+            var blobClient = containerClient.GetBlobClient(blobName);
+
+            using var stream = selectedFile.OpenReadStream(maxAllowedSize: 1024 * 1024 * 5);
+            await blobClient.UploadAsync(stream, new BlobHttpHeaders { ContentType = selectedFile.ContentType });
+            imageUrl = blobClient.Uri.ToString();
+        }
+
+        // 2. Create the Entity with User Info
+        var dbCampaign = new CampaignDetails
+        {
+            CampaignName = campaignModel.Name,
+            Description = campaignModel.Description,
+            Location = campaignModel.Location,
+            CampaignImage = imageUrl,
+            UserId = currentUserId,
+            UserName = currentUserName
+        };
+
+        // 3. Save to SQL
+        appDbContext.Campaigns.Add(dbCampaign);
+        await appDbContext.SaveChangesAsync();
+
+        navigationManager.NavigateTo("/");
+    }
+
+    private void HandleFileSelected(InputFileChangeEventArgs e) => selectedFile = e.File;
+}
