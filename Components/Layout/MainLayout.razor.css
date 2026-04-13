@@ -143,11 +143,10 @@
 @media (min-width: 768px) {
   .page {
     flex-direction: row;
-    margin-left: 280px; /* Account for sidebar width */
   }
 
   .main-content {
-    width: calc(100% - 280px);
+    width: auto;
     margin-left: 280px;
   }
 
