@@ -12,4 +12,5 @@ public class DnDDbContext : DbContext
 
     public DbSet<UserAccount> UserAccounts { get; set; }
     public DbSet<CampaignDetails> Campaigns { get; set; }
+    public DbSet<Character> Characters { get; set; }
 }
