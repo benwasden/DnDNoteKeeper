@@ -75,7 +75,7 @@
             navigationManager.NavigateTo("/login");
         } catch (Exception ex) {
             Console.WriteLine(ex);
-            errorMessage = "A database error occured. Please try again later.";
+            errorMessage = "A database error occured (likely timed out). Please try again in a few seceonds!";
         }
     }
 }
