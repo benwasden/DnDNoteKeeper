@@ -108,8 +108,8 @@ public partial class CreateCharacterForm
         // Save to database and navigate
         try
         {
-            // Map your model to the database entity
-            var dbCharacter = new DnDNoteKeeper.Models.Character
+            // Map model to the database entity
+            var dbCharacter = new Models.Character
             {
                 UserId = _currentUserId,
                 Name = characterModel.Name,
