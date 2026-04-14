@@ -1,0 +1,192 @@
+@page "/dice-roller"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@rendermode InteractiveServer
+
+<PageTitle>Dice Roller - DnD Note Keeper</PageTitle>
+
+<div class="container-fluid px-4 py-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <!-- Header -->
+            <div class="mb-4">
+                <h2 class="h3 mb-1">Dice Roller</h2>
+                <p class="text-muted mb-0">Roll any combination of dice for your adventure</p>
+            </div>
+
+            <!-- Quick Roll Buttons -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-dark text-white fw-bold">
+                    <i class="bi bi-dice-6 me-2"></i>Quick Roll
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-flex flex-wrap gap-2">
+                        @foreach (var die in QuickDice)
+                        {
+                            var d = die;
+                            <button class="btn btn-outline-primary fw-bold px-4 py-2"
+                                    style="min-width:70px"
+                                    type="button"
+                                    @onclick="() => QuickRoll(d)">
+                                d@(d)
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Roll -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-dark text-white fw-bold">
+                    <i class="bi bi-sliders me-2"></i>Custom Roll
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-sm-3">
+                            <label class="form-label fw-bold">Number of Dice</label>
+                            <input type="number" class="form-control" min="1" max="100"
+                                   @bind="customCount" />
+                        </div>
+                        <div class="col-sm-3">
+                            <label class="form-label fw-bold">Die Type</label>
+                            <select class="form-select" @bind="customSides">
+                                @foreach (var die in QuickDice)
+                                {
+                                    <option value="@die">d@(die)</option>
+                                }
+                                <option value="100">d100</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-3">
+                            <label class="form-label fw-bold">Modifier</label>
+                            <input type="number" class="form-control"
+                                   @bind="customModifier" />
+                        </div>
+                        <div class="col-sm-3">
+                            <button type="button" class="btn btn-primary w-100" @onclick="RollCustom">
+                                <i class="bi bi-dice-6-fill me-2"></i>Roll @customCount d@(customSides)@(customModifier >= 0 ? $"+{customModifier}" : $"{customModifier}")
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result Display -->
+            @if (currentResult != null)
+            {
+                <div class="card shadow-sm mb-4 border-primary">
+                    <div class="card-header bg-primary text-white fw-bold d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-stars me-2"></i>Result — @currentResult.Label</span>
+                        <span class="badge bg-white text-primary fs-5">@currentResult.Total</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            @foreach (var roll in currentResult.Rolls)
+                            {
+                                var isMax = roll == currentResult.Sides;
+                                var isMin = roll == 1;
+                                <span class="badge fs-6 px-3 py-2 @(isMax ? "bg-success" : isMin ? "bg-danger" : "bg-secondary")">
+                                    @roll
+                                </span>
+                            }
+                        </div>
+                        @if (currentResult.Modifier != 0)
+                        {
+                            <p class="text-muted small mb-1">
+                                Dice sum: <strong>@currentResult.Rolls.Sum()</strong>
+                                &nbsp;+&nbsp; Modifier: <strong>@(currentResult.Modifier >= 0 ? $"+{currentResult.Modifier}" : $"{currentResult.Modifier}")</strong>
+                                &nbsp;= <strong>@currentResult.Total</strong>
+                            </p>
+                        }
+                        <p class="text-muted small mb-0">
+                            <span class="badge bg-success me-1">■</span> Max roll &nbsp;
+                            <span class="badge bg-danger me-1">■</span> Min roll &nbsp;
+                            <span class="badge bg-secondary me-1">■</span> Other
+                        </p>
+                    </div>
+                </div>
+            }
+
+            <!-- Roll History -->
+            @if (history.Count > 0)
+            {
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center fw-bold">
+                        <span><i class="bi bi-clock-history me-2"></i>Roll History</span>
+                        <button type="button" class="btn btn-sm btn-outline-light" @onclick="ClearHistory">
+                            <i class="bi bi-trash me-1"></i>Clear
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            @foreach (var entry in history)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="fw-bold me-2">@entry.Label</span>
+                                        <span class="text-muted small">[@string.Join(", ", entry.Rolls)@(entry.Modifier != 0 ? $" {(entry.Modifier >= 0 ? "+" : "")}{entry.Modifier}" : "")]</span>
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill fs-6">@entry.Total</span>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+@code {
+    private static readonly int[] QuickDice = [4, 6, 8, 10, 12, 20];
+
+    private int customCount = 1;
+    private int customSides = 20;
+    private int customModifier = 0;
+
+    private RollResult? currentResult;
+    private readonly List<RollResult> history = [];
+    private readonly Random _rng = new();
+
+    private void QuickRoll(int sides)
+    {
+        var result = Roll(1, sides, 0);
+        PushResult(result);
+    }
+
+    private void RollCustom()
+    {
+        var count = Math.Clamp(customCount, 1, 100);
+        var result = Roll(count, customSides, customModifier);
+        PushResult(result);
+    }
+
+    private RollResult Roll(int count, int sides, int modifier)
+    {
+        var rolls = Enumerable.Range(0, count).Select(_ => _rng.Next(1, sides + 1)).ToList();
+        var total = rolls.Sum() + modifier;
+        var label = count == 1
+            ? $"d{sides}{(modifier != 0 ? (modifier >= 0 ? $"+{modifier}" : $"{modifier}") : "")}"
+            : $"{count}d{sides}{(modifier != 0 ? (modifier >= 0 ? $"+{modifier}" : $"{modifier}") : "")}";
+
+        return new RollResult(label, sides, rolls, modifier, total);
+    }
+
+    private void PushResult(RollResult result)
+    {
+        currentResult = result;
+        history.Insert(0, result);
+        if (history.Count > 20)
+            history.RemoveAt(history.Count - 1);
+    }
+
+    private void ClearHistory()
+    {
+        history.Clear();
+        currentResult = null;
+    }
+
+    private record RollResult(string Label, int Sides, List<int> Rolls, int Modifier, int Total);
+}
