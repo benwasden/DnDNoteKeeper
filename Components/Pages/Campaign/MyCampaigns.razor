@@ -52,7 +52,7 @@
                     <tbody>
                         @foreach (var campaign in campaigns)
                         {
-                            <tr role="button" @onclick="@(() => Navigation.NavigateTo($"/campaigns/view/{campaign.Id}"))" style="cursor: pointer;">
+                            <tr role="button" @onclick="@(() => Navigation.NavigateTo($"/campaigns/{campaign.Id}"))" style="cursor: pointer;">
                                 <td>
                                     <div class="rounded overflow-hidden" style="width: 50px; height: 50px;">
                                         @if (!string.IsNullOrEmpty(campaign.CampaignImage))
