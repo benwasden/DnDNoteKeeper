@@ -40,9 +40,11 @@
 </div>
 
 @code {
+    // Authentication used throughout app (until limitations were discovered)
     [CascadingParameter]
     public HttpContext? HttpContext{ get; set; }
 
+    // Form validation
     [SupplyParameterFromForm]
     public LoginViewModel? Model{ get; set; }
 
@@ -54,14 +56,17 @@
         try {
             if (Model is null) return;
 
+            // Comparing user account entered to in the database, seeing if entered username exists in db
             var userAccount = appDbContext.UserAccounts
                 .FirstOrDefault(x => x.UserName == Model.UserName);
 
+            // If user account/password is null... also checks password and verifies it w/ password hasher service against hashed pwd stored in db
             if (userAccount is null || !PasswordHasher.VerifyPassword(Model.Password ?? string.Empty, userAccount.Password ?? string.Empty)) {
                 errorMessage = "Invalid username or password";
                 return;
             }
 
+            // Claims used to validate against username/id for access to certain actions around the app
             var claims = new List<Claim> {
                 new Claim(ClaimTypes.Name, Model.UserName ?? string.Empty),
                 new Claim(ClaimTypes.NameIdentifier, userAccount.Id.ToString())
@@ -69,6 +74,7 @@
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
+            // If not signed in already, sign in and navigate to the home page
             if (HttpContext != null) {
                 await HttpContext.SignInAsync(principal);
                 navigationManager.NavigateTo("/");
@@ -78,7 +84,7 @@
             }
         } catch (Exception ex) {
             Console.WriteLine(ex);
-            errorMessage = $"A database error occured. Please try again later.";
+            errorMessage = "A database error occured. Please try again later.";
         }
     }
 }

@@ -5,6 +5,8 @@
 <PageTitle>DnD Note Keeper - Organize Your Adventures</PageTitle>
 
 <div>
+    @* This allows for different home screens depending on whether user is logged in or not
+    UnAuthHome is used for unauthenticated users, UserPage for authenticated *@
     <AuthorizeView>
         <NotAuthorized>
             <UnAuthHome />

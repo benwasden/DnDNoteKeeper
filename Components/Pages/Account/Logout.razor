@@ -5,13 +5,17 @@
 <h3>Successfully logged out!</h3>
 
 @code {
+    // Sets httpcontext to null, first part of signout
     [CascadingParameter]
     public HttpContext? HttpContext { get; set; } = null!;
 
+    // Signs user out and redirects them to home after process is done
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        // Checks to see if user is authenticated
         if (HttpContext?.User?.Identity?.IsAuthenticated == true) {
+            // If so, runs signout method
             await HttpContext.SignOutAsync();
             navigationManager.NavigateTo("/logout", true);
         }

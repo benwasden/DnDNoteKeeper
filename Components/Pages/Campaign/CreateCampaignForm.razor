@@ -10,7 +10,6 @@
 @inject DnDDbContext appDbContext
 @inject NavigationManager navigationManager
 @inject AuthenticationStateProvider AuthStateProvider
-@attribute [Authorize]
 
 
 <div class="container-fluid px-4 py-3">
@@ -129,7 +128,7 @@
     private async Task HandleSubmit() {
         string? imageUrl = null;
         try {
-            // Photo upload to blob
+            // Image upload to blob db, gets URL of image for insertion into sql db
             if (selectedFile != null) {
                 var containerClient = BlobServiceClient.GetBlobContainerClient("campaign-images");
                 var blobName = $"{Guid.NewGuid()}{Path.GetExtension(selectedFile.Name)}";
@@ -140,7 +139,7 @@
                 imageUrl = blobClient.Uri.ToString();
             }
 
-            // User entity info
+            // User entity info, assigned vs a CampaignDetails model. Uses url of image from prior if statement
             var dbCampaign = new CampaignDetails {
                 CampaignName = campaignModel.Name,
                 Description = campaignModel.Description,

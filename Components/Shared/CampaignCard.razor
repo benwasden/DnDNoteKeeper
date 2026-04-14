@@ -6,6 +6,7 @@
          style="cursor: pointer;" 
          @onclick="NavigateToDetails">
         
+        @* Checks to see if an image was uploaded or not in the db *@
         @if (!string.IsNullOrEmpty(Campaign.CampaignImage))
         {
             <img src="@Campaign.CampaignImage" class="card-img-top" 
@@ -13,6 +14,7 @@
         }
         else
         {
+            @* If not, uses a placeholder image in the /images/ folder (inside wwwroot) *@
             <img src="/images/campaignplaceholder.jpg" class="card-img-top" 
                  style="height: 200px; object-fit: cover;" alt="Campaign Banner" />
         }
@@ -32,6 +34,7 @@
     [Parameter] 
     public CampaignDetails Campaign { get; set; } = default!;
 
+    // Allows each card to be clicked to travel to the campaigndetail page for that specific campaign
     private void NavigateToDetails()
     {
         navigationManager.NavigateTo($"/campaigns/{Campaign.Id}");

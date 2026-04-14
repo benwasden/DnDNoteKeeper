@@ -30,6 +30,7 @@
 </div>
 
 @code {
+    // Form validation
     [SupplyParameterFromForm]
     public required LoginViewModel RegModel { get; set; }
 
@@ -40,24 +41,29 @@
 
     private string? errorMessage;
 
+    // Takes form info, compares against what's in db, registers user in db if all conditions are met
     private async Task HandleRegistration() {
         try {
+            // Checks to see if username already exists in db
             var existing = appDbContext.UserAccounts.Any(x => x.UserName == RegModel.UserName);
 
+            // Rejects if username exists
             if (existing) {
                 errorMessage = "Username already taken.";
                 return;
             }
-
+            // Defining specified credentials against UserAccount model
             var newUser = new UserAccount {
                 UserName = RegModel.UserName,
-
+                // Uses the PasswordHasher service to hash password before sending to db
                 Password = PasswordHasher.HashPassword(RegModel.Password ?? string.Empty) 
             };
 
+            // Adds user to db (ID's generated and autoincrements, username and hashed pwd sent)
             appDbContext.UserAccounts.Add(newUser);
             await appDbContext.SaveChangesAsync();
             
+            // Navigates to the home page
             navigationManager.NavigateTo("/");
         } catch (Exception ex) {
             Console.WriteLine(ex);

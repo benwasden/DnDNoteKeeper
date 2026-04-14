@@ -10,6 +10,7 @@
 <div class="container-fluid mt-4">
     @if (campaign == null)
     {
+        @* Checks for content to see if campaign exists or not, if it doesn't it displays a "campaign not found" message *@
         @if (isLoading)
         {
             <div class="d-flex justify-content-center mt-5">
@@ -28,12 +29,14 @@
     }
     else
     {
+        @* Creating detail - detail page contain image, name, and dm like cards, but also description and location *@
         <div class=" shadow-lg border-0 overflow-hidden">
             <div class="position-relative">
                 <img src="@(string.IsNullOrEmpty(campaign.CampaignImage) ? "/images/campaignplaceholder.jpg" : campaign.CampaignImage)" 
                      class="img-fluid w-100" 
                      style="height: 350px; object-fit: cover; filter: brightness(0.7);" 
                      alt="Campaign Banner">
+                
                 
                 <div class="position-absolute top-0 start-0 m-4">
                     <a href="/campaigns" class="btn btn-sm btn-light opacity-75">
@@ -63,7 +66,6 @@
                                     <label class="small text-uppercase text-muted d-block">Dungeon Master</label>
                                     <span class="fs-5">@campaign.UserName</span>
                                 </div>
-                                
                             </div>
                         </div>
                     </div>
@@ -85,6 +87,9 @@
         isLoading = true;
         try 
         {
+            // Queries campaigns table for the campaign with matching id
+            // Uses the "asnotracking" method to increase speed since this is
+            // read-only
             campaign = await appDbContext.Campaigns
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Id == campaignId);

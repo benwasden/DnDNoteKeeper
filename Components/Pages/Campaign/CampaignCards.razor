@@ -17,8 +17,10 @@
     else
     {
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @* Iterates through each entry in campaign table *@
             @foreach (var campaign in campaignList)
             {
+                @* Resolved issues I had with clickable components *@
                 <CampaignCard Campaign="campaign" @rendermode="InteractiveServer" />
             }
         </div>
@@ -30,6 +32,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // Db reference to campaign table, reference made in CampaignDetails model
+        // Runs at start (async/await)
         campaignList = await appDbContext.Campaigns.ToListAsync();
     }
 }
