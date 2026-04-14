@@ -1,0 +1,199 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using DnDNoteKeeper.Models
+@using DnDNoteKeeper.Models.ViewModels
+@using DnDNoteKeeper.Data
+
+<PageTitle>Create Character - DnD Note Keeper</PageTitle>
+
+<div class="container-fluid px-4 py-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+
+            <!-- Header -->
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h2 class="h3 mb-1">Create New Character</h2>
+                    <p class="text-muted mb-0">Build your adventurer and roll for stats</p>
+                </div>
+                <a href="/characters" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Characters
+                </a>
+            </div>
+
+            <EditForm Model="@characterModel" OnValidSubmit="@HandleSubmit" FormName="CreateCharacterForm">
+                <DataAnnotationsValidator />
+
+                <!-- Identity -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-dark text-white fw-bold">
+                        <i class="bi bi-person-badge me-2"></i>Identity
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Character Name *</label>
+                                <InputText @bind-Value="characterModel.Name"
+                                           class="form-control"
+                                           placeholder="Enter character name..." />
+                                <ValidationMessage For="() => characterModel.Name" class="text-danger small" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Race *</label>
+                                <InputSelect @bind-Value="characterModel.Race" class="form-select">
+                                    <option value="">-- Select Race --</option>
+                                    @foreach (var race in GameConstants.Races)
+                                    {
+                                        <option value="@race">@race</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="() => characterModel.Race" class="text-danger small" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Class *</label>
+                                <InputSelect @bind-Value="characterModel.Class" class="form-select">
+                                    <option value="">-- Select Class --</option>
+                                    @foreach (var cls in GameConstants.Classes)
+                                    {
+                                        <option value="@cls">@cls</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="() => characterModel.Class" class="text-danger small" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Background</label>
+                                <InputSelect @bind-Value="characterModel.Background" class="form-select">
+                                    <option value="">-- Select Background --</option>
+                                    @foreach (var bg in GameConstants.Backgrounds)
+                                    {
+                                        <option value="@bg">@bg</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Alignment</label>
+                                <InputSelect @bind-Value="characterModel.Alignment" class="form-select">
+                                    <option value="">-- Select Alignment --</option>
+                                    @foreach (var aln in GameConstants.Alignments)
+                                    {
+                                        <option value="@aln">@aln</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Level</label>
+                                <InputNumber @bind-Value="characterModel.Level" class="form-control" min="1" max="20" />
+                                <ValidationMessage For="() => characterModel.Level" class="text-danger small" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ability Scores -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-dark text-white d-flex align-items-center justify-content-between">
+                        <span><i class="bi bi-dice-6 me-2"></i>Ability Scores</span>
+                        <button type="button" class="btn btn-sm btn-warning fw-bold" @onclick="RollAllStats">
+                            <i class="bi bi-dice-6-fill me-1"></i>Roll All (4d6 drop lowest)
+                        </button>
+                    </div>
+                    <div class="card-body p-4">
+                        <p class="text-muted small mb-3">
+                            Each stat is generated by rolling 4d6, dropping the lowest die.
+                            You can roll individually or roll all at once. Values can also be edited manually.
+                        </p>
+                        <div class="row g-3">
+                            @foreach (var stat in GameConstants.StatNames)
+                            {
+                                var currentStat = stat;
+                                var rolls = GetLastRoll(currentStat);
+                                var value = GetStat(currentStat);
+                                var modifier = GetModifierString(value);
+                                <div class="col-md-4">
+                                    <div class="border rounded p-3 h-100 stat-card">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="fw-bold text-uppercase small text-muted">@currentStat</span>
+                                            <button type="button" class="btn btn-sm btn-outline-primary py-0" @onclick="() => RollStat(currentStat)">
+                                                <i class="bi bi-dice-6"></i>
+                                            </button>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="number" min="1" max="30"
+                                                   class="form-control form-control-lg text-center fw-bold"
+                                                   style="width:80px"
+                                                   value="@value"
+                                                   @onchange="@(e => SetStat(currentStat, int.TryParse(e.Value?.ToString(), out var n) ? n : value))" />
+                                            <span class="fs-5 fw-bold text-secondary">@modifier</span>
+                                        </div>
+                                        @if (rolls.Length > 0)
+                                        {
+                                            var dropped = rolls.Min();
+                                            <div class="mt-2 small text-muted">
+                                                Rolled:
+                                                @foreach (var die in rolls.OrderByDescending(d => d))
+                                                {
+                                                    <span class="badge @(die == dropped && rolls.Count(d => d == dropped) == 1 ? "bg-secondary text-decoration-line-through" : "bg-primary") me-1">@die</span>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hit Points -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-dark text-white fw-bold">
+                        <i class="bi bi-heart-pulse me-2"></i>Hit Points
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Max Hit Points</label>
+                                <InputNumber @bind-Value="characterModel.HitPoints" class="form-control" min="1" />
+                                <ValidationMessage For="() => characterModel.HitPoints" class="text-danger small" />
+                            </div>
+                            <div class="col-md-4">
+                                <button type="button" class="btn btn-outline-danger" @onclick="RollHitPoints">
+                                    <i class="bi bi-dice-3 me-1"></i>Roll HP (@GetHitDie())
+                                </button>
+                            </div>
+                            @if (!string.IsNullOrEmpty(characterModel.Class))
+                            {
+                                <div class="col-md-4 text-muted small">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    <strong>@characterModel.Class</strong> uses a @GetHitDie() hit die.
+                                    CON modifier: @GetModifierString(characterModel.Constitution)
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backstory -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-dark text-white fw-bold">
+                        <i class="bi bi-book me-2"></i>Backstory
+                    </div>
+                    <div class="card-body p-4">
+                        <InputTextArea @bind-Value="characterModel.Backstory"
+                                       class="form-control"
+                                       rows="4"
+                                       placeholder="Write your character's backstory..." />
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="d-flex justify-content-end mb-5">
+                    <a href="/characters" class="btn btn-outline-secondary me-2">Cancel</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>Create Character
+                    </button>
+                </div>
+                <span class="text-danger">@errorMessage</span>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
