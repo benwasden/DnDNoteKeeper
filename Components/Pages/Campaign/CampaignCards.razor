@@ -1,4 +1,5 @@
 ﻿@page "/campaigns"
+
 @using DnDNoteKeeper.Data
 @using DnDNoteKeeper.Models
 @using DnDNoteKeeper.Components.Shared
@@ -7,8 +8,11 @@
 @inject DnDDbContext appDbContext
 @attribute [Authorize]
 
+<PageTitle>Active Campaigns - DnD Notekeeper</PageTitle>
+
 <div class="container mt-4">
-    <h2 class="text-white mb-4">Active Campaigns</h2>
+    <h2>Find an Active Campaign!</h2>
+    <span class="text-danger">@errorMessage</span>
 
     @if (campaignList == null)
     {
@@ -29,11 +33,18 @@
 
 @code {
     private List<CampaignDetails>? campaignList;
+    
+    private string? errorMessage;
 
     protected override async Task OnInitializedAsync()
     {
         // Db reference to campaign table, reference made in CampaignDetails model
         // Runs at start (async/await)
-        campaignList = await appDbContext.Campaigns.ToListAsync();
+        try {
+            campaignList = await appDbContext.Campaigns.ToListAsync();
+        } catch (Exception ex) {
+            Console.WriteLine(ex);
+            errorMessage = "A database issue occured (likely a timeout). Please try again!";
+        }
     }
 }

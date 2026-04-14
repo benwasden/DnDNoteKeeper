@@ -1,0 +1,66 @@
+@page "/characters/{characterId:int}"
+
+@using Microsoft.EntityFrameworkCore
+@using System.Linq
+@inject DnDDbContext AppDbContext
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>@character?.Name - DnD Notekeeper</PageTitle>
+
+<div class="container mt-4">
+    @if (character == null)
+    {
+        <p>Loading character details...</p>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h2>@character.Name</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Race:</strong> @character.Race</p>
+                        <p><strong>Class:</strong> @character.Class</p>
+                        <p><strong>Level:</strong> @character.Level</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Background:</strong> @character.Background</p>
+                        <p><strong>Alignment:</strong> @character.Alignment</p>
+                        <p><strong>Hit Points:</strong> @character.HitPoints</p>
+                    </div>
+                </div>
+                <hr />
+                <h5>Backstory</h5>
+                <p>@character.Backstory</p>
+            </div>
+            <div class="card-footer">
+                <a href="/characters" class="btn btn-outline-secondary">Back to List</a>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public int characterId { get; set; }
+    private Character? character;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        
+        if (user.Identity?.IsAuthenticated == true) {
+        // Fetch the specific character from the database
+        character = await AppDbContext.Characters
+            .FirstOrDefaultAsync(c => c.CharacterId == characterId);
+
+            if (character == null)
+            {
+                Navigation.NavigateTo("/characters");
+            }
+        }
+    }
+}
