@@ -1,5 +1,6 @@
 ﻿@page "/characters/create"
 @using System.ComponentModel.DataAnnotations
+@using DnDNoteKeeper.Models
 @rendermode InteractiveServer
 
 <PageTitle>Create Character - DnD Note Keeper</PageTitle>
@@ -307,47 +308,5 @@
     {
         Console.WriteLine($"Character created: {characterModel.Name} ({characterModel.Race} {characterModel.Class})");
         // TODO: Save to database and navigate
-    }
-
-    public class CreateCharacterModel
-    {
-        [Required(ErrorMessage = "Character name is required")]
-        [StringLength(100, ErrorMessage = "Name cannot exceed 100 characters")]
-        public string Name { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Race is required")]
-        public string Race { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Class is required")]
-        public string Class { get; set; } = string.Empty;
-
-        public string? Background { get; set; }
-        public string? Alignment { get; set; }
-
-        [Range(1, 20, ErrorMessage = "Level must be between 1 and 20")]
-        public int Level { get; set; } = 1;
-
-        [Range(1, 30, ErrorMessage = "Strength must be between 1 and 30")]
-        public int Strength { get; set; }
-
-        [Range(1, 30, ErrorMessage = "Dexterity must be between 1 and 30")]
-        public int Dexterity { get; set; }
-
-        [Range(1, 30, ErrorMessage = "Constitution must be between 1 and 30")]
-        public int Constitution { get; set; }
-
-        [Range(1, 30, ErrorMessage = "Intelligence must be between 1 and 30")]
-        public int Intelligence { get; set; }
-
-        [Range(1, 30, ErrorMessage = "Wisdom must be between 1 and 30")]
-        public int Wisdom { get; set; }
-
-        [Range(1, 30, ErrorMessage = "Charisma must be between 1 and 30")]
-        public int Charisma { get; set; }
-
-        [Range(1, 999, ErrorMessage = "Hit points must be at least 1")]
-        public int HitPoints { get; set; } = 1;
-
-        public string? Backstory { get; set; }
     }
 }

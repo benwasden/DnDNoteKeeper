@@ -3,67 +3,68 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DnDNoteKeeper.Models;
 
-[Table("character")]
+[Table("characters")]
 public class Character
 {
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    [Column("character_id")]
-    public int Id { get; set; }
+    [Column("character_Id")]
+    public int CharacterId { get; set; }
 
-    [Column("name")]
+    [Required]
+    [Column("user_Id")]
+    public int UserId { get; set; }
+
+    [Required]
+    [Column("character_name")]
     [MaxLength(100)]
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; set; } = "";
 
+    [Required]
     [Column("race")]
     [MaxLength(50)]
-    public string Race { get; set; } = string.Empty;
+    public string Race { get; set; } = "";
 
+    [Required]
     [Column("class")]
     [MaxLength(50)]
-    public string Class { get; set; } = string.Empty;
+    public string Class { get; set; } = "";
 
     [Column("background")]
-    [MaxLength(50)]
+    [MaxLength(100)]
     public string? Background { get; set; }
 
     [Column("alignment")]
-    [MaxLength(30)]
+    [MaxLength(50)]
     public string? Alignment { get; set; }
 
-    [Column("level")]
+    [Column("character_level")]
     public int Level { get; set; } = 1;
 
     [Column("strength")]
-    public int Strength { get; set; }
+    public int Strength { get; set; } = 10;
 
     [Column("dexterity")]
-    public int Dexterity { get; set; }
+    public int Dexterity { get; set; } = 10;
 
     [Column("constitution")]
-    public int Constitution { get; set; }
+    public int Constitution { get; set; } = 10;
 
     [Column("intelligence")]
-    public int Intelligence { get; set; }
+    public int Intelligence { get; set; } = 10;
 
     [Column("wisdom")]
-    public int Wisdom { get; set; }
+    public int Wisdom { get; set; } = 10;
 
     [Column("charisma")]
-    public int Charisma { get; set; }
+    public int Charisma { get; set; } = 10;
 
     [Column("hit_points")]
-    public int HitPoints { get; set; }
+    public int HitPoints { get; set; } = 10;
 
     [Column("backstory")]
+    [MaxLength(500)]
     public string? Backstory { get; set; }
 
-    [Column("user_id")]
-    public int? UserId { get; set; }
-
-    [Column("campaign_id")]
-    public int? CampaignId { get; set; }
-
-    [Column("created_at")]
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    [ForeignKey(nameof(UserId))]
+    public virtual UserAccount? UserAccount { get; set; }
 }
