@@ -1,6 +1,7 @@
 ﻿@page "/characters/create"
 @using System.ComponentModel.DataAnnotations
 @using DnDNoteKeeper.Models
+@using DnDNoteKeeper.Data
 @rendermode InteractiveServer
 
 <PageTitle>Create Character - DnD Note Keeper</PageTitle>
@@ -41,7 +42,7 @@
                                 <label class="form-label fw-bold">Race *</label>
                                 <InputSelect @bind-Value="characterModel.Race" class="form-select">
                                     <option value="">-- Select Race --</option>
-                                    @foreach (var race in Races)
+                                    @foreach (var race in GameConstants.Races)
                                     {
                                         <option value="@race">@race</option>
                                     }
@@ -52,7 +53,7 @@
                                 <label class="form-label fw-bold">Class *</label>
                                 <InputSelect @bind-Value="characterModel.Class" class="form-select">
                                     <option value="">-- Select Class --</option>
-                                    @foreach (var cls in Classes)
+                                    @foreach (var cls in GameConstants.Classes)
                                     {
                                         <option value="@cls">@cls</option>
                                     }
@@ -63,7 +64,7 @@
                                 <label class="form-label fw-bold">Background</label>
                                 <InputSelect @bind-Value="characterModel.Background" class="form-select">
                                     <option value="">-- Select Background --</option>
-                                    @foreach (var bg in Backgrounds)
+                                    @foreach (var bg in GameConstants.Backgrounds)
                                     {
                                         <option value="@bg">@bg</option>
                                     }
@@ -73,7 +74,7 @@
                                 <label class="form-label fw-bold">Alignment</label>
                                 <InputSelect @bind-Value="characterModel.Alignment" class="form-select">
                                     <option value="">-- Select Alignment --</option>
-                                    @foreach (var aln in Alignments)
+                                    @foreach (var aln in GameConstants.Alignments)
                                     {
                                         <option value="@aln">@aln</option>
                                     }
@@ -102,7 +103,7 @@
                             You can roll individually or roll all at once. Values can also be edited manually.
                         </p>
                         <div class="row g-3">
-                            @foreach (var stat in StatNames)
+                            @foreach (var stat in GameConstants.StatNames)
                             {
                                 var currentStat = stat;
                                 var rolls = GetLastRoll(currentStat);
@@ -199,41 +200,6 @@
 
 <!-- Inline stat card component -->
 @code {
-    private static readonly string[] StatNames = ["Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"];
-
-    private static readonly string[] Races =
-    [
-        "Human", "Elf", "Dwarf", "Halfling", "Gnome",
-        "Half-Elf", "Half-Orc", "Tiefling", "Dragonborn"
-    ];
-
-    private static readonly string[] Classes =
-    [
-        "Barbarian", "Bard", "Cleric", "Druid", "Fighter",
-        "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"
-    ];
-
-    private static readonly string[] Backgrounds =
-    [
-        "Acolyte", "Charlatan", "Criminal", "Entertainer", "Folk Hero",
-        "Guild Artisan", "Hermit", "Noble", "Outlander", "Sage", "Sailor",
-        "Soldier", "Urchin"
-    ];
-
-    private static readonly string[] Alignments =
-    [
-        "Lawful Good", "Neutral Good", "Chaotic Good",
-        "Lawful Neutral", "True Neutral", "Chaotic Neutral",
-        "Lawful Evil", "Neutral Evil", "Chaotic Evil"
-    ];
-
-    private static readonly Dictionary<string, int> ClassHitDice = new()
-    {
-        ["Barbarian"] = 12, ["Fighter"] = 10, ["Paladin"] = 10, ["Ranger"] = 10,
-        ["Bard"] = 8, ["Cleric"] = 8, ["Druid"] = 8, ["Monk"] = 8,
-        ["Rogue"] = 8, ["Warlock"] = 8, ["Sorcerer"] = 6, ["Wizard"] = 6
-    };
-
     [SupplyParameterFromForm]
     public CreateCharacterModel characterModel { get; set; } = new();
 
@@ -279,18 +245,18 @@
 
     private void RollAllStats()
     {
-        foreach (var stat in StatNames)
+        foreach (var stat in GameConstants.StatNames)
             RollStat(stat);
     }
 
     private string GetHitDie() =>
-        !string.IsNullOrEmpty(characterModel.Class) && ClassHitDice.TryGetValue(characterModel.Class, out var die)
+        !string.IsNullOrEmpty(characterModel.Class) && GameConstants.ClassHitDice.TryGetValue(characterModel.Class, out var die)
             ? $"d{die}"
             : "d8";
 
     private void RollHitPoints()
     {
-        int die = !string.IsNullOrEmpty(characterModel.Class) && ClassHitDice.TryGetValue(characterModel.Class, out var d) ? d : 8;
+        int die = !string.IsNullOrEmpty(characterModel.Class) && GameConstants.ClassHitDice.TryGetValue(characterModel.Class, out var d) ? d : 8;
         int conMod = GetModifier(characterModel.Constitution);
         int total = Math.Max(1, _rng.Next(1, die + 1) + conMod);
         characterModel.HitPoints = total;
