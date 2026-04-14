@@ -107,15 +107,15 @@
                         </a>
                     </div>
                     <div class="col-6 col-lg-3">
-                        <a href="/world-maps" class="btn btn-outline-secondary w-100 text-center">
+                        <a href="/mycampaigns" class="btn btn-outline-secondary w-100 text-center">
                             <i class="bi bi-map d-block fs-4 mb-1"></i>
-                            <small>World Maps</small>
+                            <small>My Campaigns</small>
                         </a>
                     </div>
                     <div class="col-6 col-lg-3">
-                        <a href="/notes" class="btn btn-outline-danger w-100 text-center">
-                            <i class="bi bi-pencil-square d-block fs-4 mb-1"></i>
-                            <small>Quick Note</small>
+                        <a href="/characters" class="btn btn-outline-danger w-100 text-center">
+                            <i class="bi bi-map d-block fs-4 mb-1"></i>
+                            <small>My Characters</small>
                         </a>
                     </div>
                 </div>
@@ -205,24 +205,25 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="mb-1">@character.Name</h6>
-                                        <small class="text-muted">Level @character.Level @character.Race @character.Class</small>
+                                        <small class="text-muted">Level @character.Level @character.Race
+                                            @character.Class</small>
+                                        </div>
+                                        <span class="badge bg-secondary">Lvl @character.Level</span>
                                     </div>
-                                    <span class="badge bg-secondary">Lvl @character.Level</span>
-                                </div>
-                            </a>
-                        }
-                    </div>
-                }
+                                </a>
+                            }
+                        </div>
+                    }
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<style>
-    .list-group-item-action:hover {
-        background-color: #f8f9fa;
-    }
-</style>
+    <style>
+        .list-group-item-action:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
 
 @code {
     private List<CampaignDetails> campaigns = [];

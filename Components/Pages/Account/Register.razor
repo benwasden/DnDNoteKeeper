@@ -72,7 +72,7 @@
             await appDbContext.SaveChangesAsync();
             
             // Navigates to the home page
-            navigationManager.NavigateTo("/");
+            navigationManager.NavigateTo("/login");
         } catch (Exception ex) {
             Console.WriteLine(ex);
             errorMessage = "A database error occured. Please try again later.";
