@@ -52,28 +52,52 @@
                 <i class="bi bi-x-lg fs-4"></i>
             </button>
         </div>
-        @* <nav class="mobile-nav-menu">
-            <a href="" class="mobile-nav-item active">
+        <nav class="mobile-nav-menu">
+            <a href="" class="mobile-nav-item" onclick="toggleMobileNav()">
                 <i class="bi bi-house-door me-3"></i> Home
             </a>
             <div class="mobile-nav-divider"></div>
-            <a href="#" class="mobile-nav-item">
-                <i class="bi bi-journal-bookmark me-3"></i> Campaigns
-            </a>
-            <a href="#" class="mobile-nav-item">
-                <i class="bi bi-people me-3"></i> Characters
-            </a>
-            <a href="#" class="mobile-nav-item">
-                <i class="bi bi-map me-3"></i> World Maps
-            </a>
-            <div class="mobile-nav-divider"></div>
-            <a href="#" class="mobile-nav-item">
-                <i class="bi bi-gear me-3"></i> Settings
-            </a>
-            <a href="#" class="mobile-nav-item">
-                <i class="bi bi-question-circle me-3"></i> Support
-            </a>
-        </nav> *@
+            <AuthorizeView>
+                <Authorized>
+                    <div class="mobile-nav-section-header">Campaign Tools</div>
+                    <a href="campaigns" class="mobile-nav-item" onclick="toggleMobileNav()">
+                        <i class="bi bi-journal-bookmark me-3"></i> Campaigns
+                    </a>
+                    <a href="characters" class="mobile-nav-item" onclick="toggleMobileNav()">
+                        <i class="bi bi-people me-3"></i> Characters
+                    </a>
+                    <a href="world-maps" class="mobile-nav-item" onclick="toggleMobileNav()">
+                        <i class="bi bi-map me-3"></i> World Maps
+                    </a>
+                    <a href="sessions" class="mobile-nav-item" onclick="toggleMobileNav()">
+                        <i class="bi bi-calendar-event me-3"></i> Sessions
+                    </a>
+                    <a href="notes" class="mobile-nav-item" onclick="toggleMobileNav()">
+                        <i class="bi bi-file-text me-3"></i> Notes
+                    </a>
+                    <a href="dice-roller" class="mobile-nav-item" onclick="toggleMobileNav()">
+                        <i class="bi bi-dice-5 me-3"></i> Dice Roller
+                    </a>
+                    <div class="mobile-nav-divider"></div>
+                    <div class="mobile-nav-section-header">Account</div>
+                    <a href="settings" class="mobile-nav-item" onclick="toggleMobileNav()">
+                        <i class="bi bi-gear me-3"></i> Settings
+                    </a>
+                    <a href="logout" class="mobile-nav-item" onclick="toggleMobileNav()">
+                        <i class="bi bi-box-arrow-right me-3"></i> Logout
+                    </a>
+                </Authorized>
+                <NotAuthorized>
+                    <div class="mobile-nav-section-header">Account</div>
+                    <a href="login" class="mobile-nav-item" onclick="toggleMobileNav()">
+                        <i class="bi bi-box-arrow-in-right me-3"></i> Login
+                    </a>
+                    <a href="register" class="mobile-nav-item" onclick="toggleMobileNav()">
+                        <i class="bi bi-person-plus me-3"></i> Create Account
+                    </a>
+                </NotAuthorized>
+            </AuthorizeView>
+        </nav>
     </div>
 </div>
 
