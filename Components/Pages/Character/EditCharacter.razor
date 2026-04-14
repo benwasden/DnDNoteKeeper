@@ -1,0 +1,10 @@
+@page "/characters/edit/{Id:int}"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+
+<CreateCharacterForm Id="Id" @rendermode="InteractiveServer" />
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+}
