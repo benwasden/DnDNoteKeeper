@@ -34,6 +34,8 @@ builder.Services.AddAzureClients(clientBuilder =>
     clientBuilder.AddBlobServiceClient(builder.Configuration.GetConnectionString("AzureBlobStorage"));
 });
 
+builder.Services.AddScoped<ICampaignService, CampaignService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

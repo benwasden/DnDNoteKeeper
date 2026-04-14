@@ -33,6 +33,8 @@
                             <th>Race</th>
                             <th>Class</th>
                             <th>Level</th>
+                            <th></th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -43,6 +45,11 @@
                                 <td>@character.Race</td>
                                 <td>@character.Class</td>
                                 <td>@character.Level</td>
+                                <td>
+                                    <a href=@($"/characters/edit/{character.CharacterId}") class="btn btn-info btn-sm">
+                                    <i class="bi bi-pencil-fill"></i>
+                                    </a>
+                                </td>
                                 <td>
                                     <button class="btn btn-danger btn-sm" 
                                         @onclick="() => DeleteCharacter(character.CharacterId)" 

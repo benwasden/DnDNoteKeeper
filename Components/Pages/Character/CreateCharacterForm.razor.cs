@@ -12,6 +12,50 @@ public partial class CreateCharacterForm
     [Inject] private NavigationManager Navigation { get; set; } = default!;
     [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
 
+    [Parameter] public int? Id { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Get the user ID 
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            var idClaim = user.FindFirst(ClaimTypes.NameIdentifier);
+            if (idClaim != null) _currentUserId = int.Parse(idClaim.Value);
+        }
+
+        // Checks to see if user is editing rather than creating new character
+        if (Id.HasValue && characterModel.Name == "")
+        {
+            // If character exists, get the data for it and switch to editing mode
+            var existing = await AppDbContext.Characters.FindAsync(Id.Value);
+
+            // Checks to make sure user exists and that user is creator of character
+            if (existing != null && existing.UserId == _currentUserId)
+            {
+                // Ties content in db to form to edit
+                characterModel = new CreateCharacterModel
+                {
+                    Name = existing.Name,
+                    Race = existing.Race,
+                    Class = existing.Class,
+                    Background = existing.Background ?? "",
+                    Alignment = existing.Alignment ?? "",
+                    Level = existing.Level,
+                    Strength = existing.Strength,
+                    Dexterity = existing.Dexterity,
+                    Constitution = existing.Constitution,
+                    Intelligence = existing.Intelligence,
+                    Wisdom = existing.Wisdom,
+                    Charisma = existing.Charisma,
+                    HitPoints = existing.HitPoints,
+                    Backstory = existing.Backstory ?? ""
+                };
+            }
+        }
+    }
+
     [SupplyParameterFromForm]
     public CreateCharacterModel characterModel { get; set; } = default!;
 
@@ -102,35 +146,44 @@ public partial class CreateCharacterForm
         return mod >= 0 ? $"+{mod}" : $"{mod}";
     }
 
-    async private void HandleSubmit()
+    async private Task HandleSubmit()
     {
-        Console.WriteLine($"Character created: {characterModel.Name} ({characterModel.Race} {characterModel.Class})");
-        // Save to database and navigate
         try
         {
-            // Map model to the database entity
-            var dbCharacter = new Models.Character
+            Models.Character? dbCharacter;
+
+            // Double check if editing or making new character
+            if (Id.HasValue)
             {
-                UserId = _currentUserId,
-                Name = characterModel.Name,
-                Race = characterModel.Race,
-                Class = characterModel.Class,
-                Background = characterModel.Background,
-                Alignment = characterModel.Alignment,
-                Level = characterModel.Level,
-                Strength = characterModel.Strength,
-                Dexterity = characterModel.Dexterity,
-                Constitution = characterModel.Constitution,
-                Intelligence = characterModel.Intelligence,
-                Wisdom = characterModel.Wisdom,
-                Charisma = characterModel.Charisma,
-                HitPoints = characterModel.HitPoints,
-                Backstory = characterModel.Backstory
-            };
+                // If exist, set to update
+                dbCharacter = await AppDbContext.Characters.FindAsync(Id.Value);
+                if (dbCharacter == null || dbCharacter.UserId != _currentUserId) return;
+            }
+            else
+            {
+                // If making new, create new character
+                dbCharacter = new Models.Character { UserId = _currentUserId };
+                AppDbContext.Characters.Add(dbCharacter);
+            }
 
-            AppDbContext.Characters.Add(dbCharacter);
+            // Mapping values from model to entity
+            dbCharacter.Name = characterModel.Name;
+            dbCharacter.Race = characterModel.Race;
+            dbCharacter.Class = characterModel.Class;
+            dbCharacter.Background = characterModel.Background;
+            dbCharacter.Alignment = characterModel.Alignment;
+            dbCharacter.Level = characterModel.Level;
+            dbCharacter.Strength = characterModel.Strength;
+            dbCharacter.Dexterity = characterModel.Dexterity;
+            dbCharacter.Constitution = characterModel.Constitution;
+            dbCharacter.Intelligence = characterModel.Intelligence;
+            dbCharacter.Wisdom = characterModel.Wisdom;
+            dbCharacter.Charisma = characterModel.Charisma;
+            dbCharacter.HitPoints = characterModel.HitPoints;
+            dbCharacter.Backstory = characterModel.Backstory;
+            
+            // Save to database (either edits or new character)
             await AppDbContext.SaveChangesAsync();
-
             Navigation.NavigateTo("/characters");
         }
         catch (Exception ex)

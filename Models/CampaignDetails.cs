@@ -33,4 +33,7 @@ public class CampaignDetails
     [Column("user_name")]
     [MaxLength(50)]
     public string? UserName { get; set; }
+
+    [Column("campaign_time")]
+    public DateTime? Time { get; set; }
 }
