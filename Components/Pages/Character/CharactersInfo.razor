@@ -1,0 +1,67 @@
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@inject NavigationManager Navigation
+
+<PageTitle>Characters - DnD Note Keeper</PageTitle>
+
+<div class="container mt-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h2 class="text-white mb-0">Characters</h2>
+        <a href="/characters/create" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Create Character
+        </a>
+    </div>
+
+    <span class="text-danger">@errorMessage</span>
+
+    @if (characterList == null)
+    {
+        <p class="text-white">Loading your characters...</p>
+    }
+    else if (!characterList.Any())
+    {
+        <p>You haven't created any characters yet.</p>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Name</th>
+                            <th>Race</th>
+                            <th>Class</th>
+                            <th>Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var character in characterList)
+                        {
+                            <tr role="button" @onclick="() => NavigateToCharacter(character.CharacterId)" class="cursor-pointer">
+                                <td class="fw-bold">@character.Name</td>
+                                <td>@character.Race</td>
+                                <td>@character.Class</td>
+                                <td>@character.Level</td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm" 
+                                        @onclick="() => DeleteCharacter(character.CharacterId)" 
+                                        @onclick:stopPropagation="true">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private void NavigateToCharacter(int id)
+    {
+        Navigation.NavigateTo($"/characters/{id}");
+    }
+}

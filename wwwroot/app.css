@@ -50,6 +50,13 @@ h1:focus {
     border-color: #929292;
 }
 
+.cursor-pointer {
+    cursor: pointer;
+}
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
 /* Mobile Navigation Enhancements */
 @media (max-width: 767.98px) {
     body.nav-open {

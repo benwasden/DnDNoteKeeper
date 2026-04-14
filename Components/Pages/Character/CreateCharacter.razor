@@ -1,3 +1,5 @@
 ﻿@page "/characters/create"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 
 <CreateCharacterForm @rendermode="InteractiveServer" />
