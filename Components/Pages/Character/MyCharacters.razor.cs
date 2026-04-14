@@ -6,7 +6,7 @@ using System.Security.Claims;
 
 namespace DnDNoteKeeper.Components.Pages.Character;
 
-public partial class CharactersInfo
+public partial class MyCharacters
 {
     [Inject] private DnDDbContext AppDbContext { get; set; } = default!;
     [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
@@ -17,9 +17,11 @@ public partial class CharactersInfo
     protected override async Task OnInitializedAsync()
     {
         try {
+            // Check to see if the user is who they say they are
             var authState = await AuthStateProvider.GetAuthenticationStateAsync();
             var user = authState.User;
 
+            // If logged in user matches, proceed
             if (user.Identity?.IsAuthenticated == true)
             {
                 var idClaim = user.FindFirst(ClaimTypes.NameIdentifier);
@@ -35,22 +37,23 @@ public partial class CharactersInfo
             errorMessage = "The database had an issue (likely timed out). Please try again shortly!";
         }
     }
+    // Removes a character if it finds them from the database
     private async Task DeleteCharacter(int characterId)
     {
-        try
-        {
+        try {
+            // Look through db for character
             var character = await AppDbContext.Characters.FindAsync(characterId);
+            // If requested character is found...
             if (character != null)
             {
+                // Remove from db
                 AppDbContext.Characters.Remove(character);
                 await AppDbContext.SaveChangesAsync();
                 
                 // Remove from the local list to update UI immediately
                 characterList?.Remove(character);
             }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             Console.WriteLine(ex);
             errorMessage = "Failed to delete the character. Please try again.";
         }

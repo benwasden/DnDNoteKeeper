@@ -7,11 +7,12 @@
 @using Microsoft.EntityFrameworkCore
 @inject DnDDbContext appDbContext
 @attribute [Authorize]
+@rendermode InteractiveServer
 
 <PageTitle>Active Campaigns - DnD Notekeeper</PageTitle>
 
 <div class="container mt-4">
-    <h2>Find an Active Campaign!</h2>
+    <h2 class="mb-4">Find an Active Campaign!</h2>
     <span class="text-danger">@errorMessage</span>
 
     @if (campaignList == null)
@@ -20,12 +21,12 @@
     }
     else
     {
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            @* Iterates through each entry in campaign table *@
+        <div class="row g-4 @(campaignList.Count < 3 ? "justify-content-center" : "")">
             @foreach (var campaign in campaignList)
             {
-                @* Resolved issues I had with clickable components *@
-                <CampaignCard Campaign="campaign" @rendermode="InteractiveServer" />
+                <div class="col-12 col-md-6 col-lg-4" style="max-width: 400px; width: 100%;">
+                    <CampaignCard Campaign="campaign" />
+                </div>
             }
         </div>
     }
@@ -39,7 +40,6 @@
     protected override async Task OnInitializedAsync()
     {
         // Db reference to campaign table, reference made in CampaignDetails model
-        // Runs at start (async/await)
         try {
             campaignList = await appDbContext.Campaigns.ToListAsync();
         } catch (Exception ex) {

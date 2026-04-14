@@ -14,10 +14,9 @@ public partial class CreateCharacterForm
 
     [Parameter] public int? Id { get; set; }
 
-// Update the loading logic
     protected override async Task OnParametersSetAsync()
     {
-        // Get the user ID (you already have this logic in OnInitializedAsync)
+        // Get the user ID 
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         if (user.Identity?.IsAuthenticated == true)
@@ -26,15 +25,16 @@ public partial class CreateCharacterForm
             if (idClaim != null) _currentUserId = int.Parse(idClaim.Value);
         }
 
-        // If we are in "Edit Mode" (Id has a value) and the model is fresh
+        // Checks to see if user is editing rather than creating new character
         if (Id.HasValue && characterModel.Name == "")
         {
+            // If character exists, get the data for it and switch to editing mode
             var existing = await AppDbContext.Characters.FindAsync(Id.Value);
 
-            // Security check: ensure character exists and belongs to the user
+            // Checks to make sure user exists and that user is creator of character
             if (existing != null && existing.UserId == _currentUserId)
             {
-                // Map the database values to your characterModel
+                // Ties content in db to form to edit
                 characterModel = new CreateCharacterModel
                 {
                     Name = existing.Name,
@@ -152,20 +152,21 @@ public partial class CreateCharacterForm
         {
             Models.Character? dbCharacter;
 
+            // Double check if editing or making new character
             if (Id.HasValue)
             {
-                // Edit Mode: Fetch the existing record
+                // If exist, set to update
                 dbCharacter = await AppDbContext.Characters.FindAsync(Id.Value);
                 if (dbCharacter == null || dbCharacter.UserId != _currentUserId) return;
             }
             else
             {
-                // Create Mode: New instance
+                // If making new, create new character
                 dbCharacter = new Models.Character { UserId = _currentUserId };
                 AppDbContext.Characters.Add(dbCharacter);
             }
 
-            // Map values from model to entity
+            // Mapping values from model to entity
             dbCharacter.Name = characterModel.Name;
             dbCharacter.Race = characterModel.Race;
             dbCharacter.Class = characterModel.Class;
@@ -180,7 +181,8 @@ public partial class CreateCharacterForm
             dbCharacter.Charisma = characterModel.Charisma;
             dbCharacter.HitPoints = characterModel.HitPoints;
             dbCharacter.Backstory = characterModel.Backstory;
-
+            
+            // Save to database (either edits or new character)
             await AppDbContext.SaveChangesAsync();
             Navigation.NavigateTo("/characters");
         }

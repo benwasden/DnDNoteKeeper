@@ -85,7 +85,7 @@
 
 <!-- Quick Actions -->
 <div class="row g-3 mb-4">
-    <div class="col-md-8">
+    <div class="col-md-12">
         <div class="card h-100">
             <div class="card-header">
                 <h5 class="card-title mb-0">
@@ -95,46 +95,30 @@
             <div class="card-body">
                 <div class="row g-2">
                     <div class="col-6 col-lg-3">
-                        <a href="/campaigns/create" class="btn btn-outline-primary w-100 text-start">
+                        <a href="/campaigns/create" class="btn btn-outline-primary w-100 text-center">
                             <i class="bi bi-journal-plus d-block fs-4 mb-1"></i>
                             <small>New Campaign</small>
                         </a>
                     </div>
                     <div class="col-6 col-lg-3">
-                        <a href="/characters/create" class="btn btn-outline-success w-100 text-start">
+                        <a href="/characters/create" class="btn btn-outline-success w-100 text-center">
                             <i class="bi bi-person-plus d-block fs-4 mb-1"></i>
                             <small>Create Character</small>
                         </a>
                     </div>
                     <div class="col-6 col-lg-3">
-                        <a href="/world-maps" class="btn btn-outline-info w-100 text-start">
+                        <a href="/world-maps" class="btn btn-outline-secondary w-100 text-center">
                             <i class="bi bi-map d-block fs-4 mb-1"></i>
                             <small>World Maps</small>
                         </a>
                     </div>
                     <div class="col-6 col-lg-3">
-                        <a href="/notes" class="btn btn-outline-warning w-100 text-start">
+                        <a href="/notes" class="btn btn-outline-danger w-100 text-center">
                             <i class="bi bi-pencil-square d-block fs-4 mb-1"></i>
                             <small>Quick Note</small>
                         </a>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-header">
-                <h6 class="card-title mb-0">
-                    <i class="bi bi-calendar-event me-2 text-success"></i>Next Session
-                </h6>
-            </div>
-            <div class="card-body text-center">
-                <h4 class="text-primary">Tomorrow</h4>
-                <p class="mb-2">The Lost Mines</p>
-                <small class="text-muted d-block">7:00 PM - 10:00 PM</small>
-                <button class="btn btn-sm btn-outline-primary mt-2">View Details</button>
             </div>
         </div>
     </div>
@@ -148,7 +132,7 @@
                 <h5 class="card-title mb-0">
                     <i class="bi bi-journal-bookmark me-2 text-primary"></i>Recent Campaigns
                 </h5>
-                <a href="/campaigns" class="btn btn-sm btn-outline-primary">View All</a>
+                <a href="/campaigns" class="btn btn-sm btn-outline-primary">All Campaigns</a>
             </div>
             <div class="card-body p-0">
                 @if (isLoading)

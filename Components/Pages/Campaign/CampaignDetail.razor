@@ -4,6 +4,7 @@
 @using DnDNoteKeeper.Models
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
+@using DnDNoteKeeper.Services
 @inject DnDDbContext appDbContext
 @inject NavigationManager nav
 @attribute [Authorize]
@@ -68,6 +69,10 @@
                                 <div class="mb-3">
                                     <label class="small text-uppercase text-muted d-block">Dungeon Master</label>
                                     <span class="fs-5">@campaign.UserName</span>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="small text-uppercase text-muted d-block">Start Time</label>
+                                    <span class="fs-5">@CampaignTime.getCampaignTime(campaign)</span>
                                 </div>
                             </div>
                         </div>

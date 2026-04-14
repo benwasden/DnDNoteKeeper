@@ -68,7 +68,8 @@ public partial class CreateCampaignForm
                 Location = campaignModel.Location,
                 CampaignImage = imageUrl,
                 UserId = currentUserId,
-                UserName = currentUserName
+                UserName = currentUserName,
+                Time = campaignModel.Time
             };
 
             // Save to sql db
