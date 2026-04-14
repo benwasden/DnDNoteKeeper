@@ -10,7 +10,14 @@
             <!-- Header -->
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <div>
-                    <h2 class="h3 mb-1">Create New Character</h2>
+                    @if (Id.HasValue)
+                        {
+                            <h2>Edit @characterModel.Name</h2>
+                        }
+                        else
+                        {
+                            <h2>Create New Character</h2>
+                        }
                     <p class="text-muted mb-0">Build your adventurer and roll for stats</p>
                 </div>
                 <a href="/characters" class="btn btn-outline-secondary">
