@@ -1,0 +1,35 @@
+﻿@page "/campaigns"
+@using DnDNoteKeeper.Data
+@using DnDNoteKeeper.Models
+@using DnDNoteKeeper.Components.Shared
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@inject DnDDbContext appDbContext
+@attribute [Authorize]
+
+<div class="container mt-4">
+    <h2 class="text-white mb-4">Active Campaigns</h2>
+
+    @if (campaignList == null)
+    {
+        <div class="spinner-border text-primary" role="status"></div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var campaign in campaignList)
+            {
+                <CampaignCard Campaign="campaign" @rendermode="InteractiveServer" />
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private List<CampaignDetails>? campaignList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        campaignList = await appDbContext.Campaigns.ToListAsync();
+    }
+}

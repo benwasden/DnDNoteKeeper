@@ -5,12 +5,11 @@ namespace DnDNoteKeeper.Models.ViewModels;
 
 public class CampaignViewModel
 {
+    [StringLength(45, ErrorMessage = "Campaign name cannot exceed 45 characters")]
     [Required(ErrorMessage = "Campaign name is required")]
-    [StringLength(100, ErrorMessage = "Campaign name cannot exceed 100 characters")]
+    public string? Name { get; set; }
 
-    public string Name { get; set; } = string.Empty;
-    [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters")]
-
+    [StringLength(200, ErrorMessage = "Description cannot exceed 200 characters")]
     [Required(ErrorMessage = "Please enter a campaign description")]
     public string? Description { get; set; }
 
@@ -18,9 +17,8 @@ public class CampaignViewModel
     public DateTime? Time { get; set; }
     
     [Required(ErrorMessage = "Location is required")]
-    [StringLength(200, ErrorMessage = "Location cannot exceed 200 characters")]
+    [StringLength(45, ErrorMessage = "Location cannot exceed 45 characters")]
     public string? Location { get; set; }
     
-    [Required(ErrorMessage = "User ID is required")]
     public int UserId { get; set; }
 }

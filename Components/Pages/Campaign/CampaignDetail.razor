@@ -1,0 +1,98 @@
+@page "/campaigns/{campaignId:int}"
+@using DnDNoteKeeper.Data
+@using DnDNoteKeeper.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@inject DnDDbContext appDbContext
+@inject NavigationManager nav
+@attribute [Authorize]
+
+<div class="container-fluid mt-4">
+    @if (campaign == null)
+    {
+        @if (isLoading)
+        {
+            <div class="d-flex justify-content-center mt-5">
+                <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-danger shadow-sm" role="alert">
+                <h4 class="alert-heading">Campaign Not Found</h4>
+                <p>The campaign you are looking for might have been deleted or the ID is incorrect.</p>
+                <hr>
+                <a href="/campaigns" class="btn btn-outline-danger">Return to List</a>
+            </div>
+        }
+    }
+    else
+    {
+        <div class=" shadow-lg border-0 overflow-hidden">
+            <div class="position-relative">
+                <img src="@(string.IsNullOrEmpty(campaign.CampaignImage) ? "/images/campaignplaceholder.jpg" : campaign.CampaignImage)" 
+                     class="img-fluid w-100" 
+                     style="height: 350px; object-fit: cover; filter: brightness(0.7);" 
+                     alt="Campaign Banner">
+                
+                <div class="position-absolute top-0 start-0 m-4">
+                    <a href="/campaigns" class="btn btn-sm btn-light opacity-75">
+                        <i class="bi bi-chevron-left"></i> Back to Campaigns
+                    </a>
+                </div>
+            </div>
+
+            <div class="card-body p-4 p-lg-5">
+                <div>
+                    <h1 class="display-3 fw-bold">@campaign.CampaignName</h1>
+                    <p class="fs-5 mb-0"><i class="bi bi-geo-alt-fill me-2"></i>@campaign.Location</p>
+                </div>
+                <div class="row">
+                    <div class="col-lg-8">
+                        <h3 class="text-primary border-bottom border-primary pb-2 mb-3">About the Campaign</h3>
+                        <p class="lead" style="white-space: pre-wrap; line-height: 1.8;">
+                            @campaign.Description
+                        </p>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="card bg-secondary bg-opacity-10 border-secondary">
+                            <div class="card-body">
+                                <h5 class="card-title text-muted mb-3">Campaign Info</h5>
+                                <div class="mb-3">
+                                    <label class="small text-uppercase text-muted d-block">Dungeon Master</label>
+                                    <span class="fs-5">@campaign.UserName</span>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] 
+    public int campaignId { get; set; }
+
+    private CampaignDetails? campaign;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        try 
+        {
+            campaign = await appDbContext.Campaigns
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.Id == campaignId);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+}
