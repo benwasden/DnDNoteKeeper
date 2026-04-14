@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
-using DnDNoteKeeper.Models;
 using DnDNoteKeeper.Data;
 using System.Security.Claims;
 

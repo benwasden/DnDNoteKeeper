@@ -1,12 +1,12 @@
 @page "/characters/{characterId:int}"
+
 @using Microsoft.EntityFrameworkCore
 @using System.Linq
-
 @inject DnDDbContext AppDbContext
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthStateProvider
 
-<PageTitle>Character Details</PageTitle>
+<PageTitle>@character?.Name - DnD Notekeeper</PageTitle>
 
 <div class="container mt-4">
     @if (character == null)
