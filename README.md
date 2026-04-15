@@ -8,7 +8,8 @@ These include:
 
 ## Hosted Link
 If you'd like to get a feel for how the app looks and functions, here's a link to a hosted instance.
-[Hosted Site][https://dnd-note-taker-ffeyc8gxdzc4gfa7.eastus-01.azurewebsites.net/]
+
+[Hosted Site](https://dnd-note-taker-ffeyc8gxdzc4gfa7.eastus-01.azurewebsites.net/)
 
 ## Using the app
 - First time you open the app, you'll be shown a logged-out view. To get anywhere, you'll want to make an account. Click "Create Account" on the sidebar.
